@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "product")
@@ -29,7 +32,7 @@ public class Product {
     private String description;
 
     @Column(name = "unit_price")
-    private BigDecimal unitPrice;
+    private double unitPrice;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -38,13 +41,15 @@ public class Product {
     private boolean active;
 
     @Column(name = "units_in_stock")
-    private Integer unitsInStock;
+    private int unitsInStock;
 
     @Column(name = "date_created")
-    private LocalDateTime dateCreated;
+    @CreationTimestamp
+    private Date dateCreated;
 
     @Column(name = "last_updated")
-    private LocalDateTime lastUpdated;
+    @UpdateTimestamp
+    private Date lastUpdated;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
