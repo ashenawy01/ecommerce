@@ -1,5 +1,6 @@
 package com.sigma.ecommerce.service;
 
+import com.sigma.ecommerce.dto.PaymentInfo;
 import com.sigma.ecommerce.dto.Purchase;
 import com.sigma.ecommerce.dto.PurchaseResponse;
 import com.sigma.ecommerce.entity.Address;
@@ -8,18 +9,27 @@ import com.sigma.ecommerce.entity.Order;
 import com.sigma.ecommerce.entity.OrderItem;
 import com.sigma.ecommerce.repository.AddressRepository;
 import com.sigma.ecommerce.repository.CustomerRepository;
-import lombok.AllArgsConstructor;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-@AllArgsConstructor
 public class CheckoutServiceImpl implements CheckoutService {
 
     private final CustomerRepository customerRepository;
     private final AddressRepository addressRepository;
+
+    public CheckoutServiceImpl(CustomerRepository customerRepository, AddressRepository addressRepository, @Value("${stripe.key.secret}") String secretKey) {
+        this.customerRepository = customerRepository;
+        this.addressRepository = addressRepository;
+
+        // initialize API with secret key
+        Stripe.apiKey = secretKey;
+    }
 
     @Override
     public PurchaseResponse placeOrder(Purchase purchase) {
@@ -62,5 +72,18 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         //Return a response with a tracking number
         return new PurchaseResponse(orderTrackingNumber);
+    }
+
+    @Override
+    public PaymentIntent createPaymentIntent(PaymentInfo paymentInfo) throws StripeException {
+        List<String> paymentMethodType = new ArrayList<>();
+        paymentMethodType.add("card");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("amount", paymentInfo.getAmount());
+        params.put("currency", paymentInfo.getCurrency());
+        params.put("payment_method_type", paymentMethodType);
+
+        return PaymentIntent.create(params);
     }
 }

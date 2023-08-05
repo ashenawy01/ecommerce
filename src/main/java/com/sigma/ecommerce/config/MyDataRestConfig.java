@@ -1,9 +1,6 @@
 package com.sigma.ecommerce.config;
 
-import com.sigma.ecommerce.entity.Country;
-import com.sigma.ecommerce.entity.Product;
-import com.sigma.ecommerce.entity.ProductCategory;
-import com.sigma.ecommerce.entity.State;
+import com.sigma.ecommerce.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
 import lombok.AllArgsConstructor;
@@ -38,6 +35,7 @@ public class MyDataRestConfig implements RepositoryRestConfigurer {
         disableHttpMethods(ProductCategory.class, config, theUnsupportedAction);
         disableHttpMethods(Country.class, config, theUnsupportedAction);
         disableHttpMethods(State.class, config, theUnsupportedAction);
+        disableHttpMethods(Order.class, config, theUnsupportedAction);
 
         // expose entity ids
         Class[] classes = entityManager.getMetamodel()
